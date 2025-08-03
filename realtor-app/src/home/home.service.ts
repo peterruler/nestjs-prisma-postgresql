@@ -4,6 +4,15 @@ import { HomeResponseDto } from './dto/home.dto';
 import { PropertyType } from 'generated/prisma';
 import { UserInfo } from 'src/user/decorators/user.decorators';
 
+export const homeSelect = {
+  id: true,
+  address: true,
+  city: true,
+  price: true,
+  propertyType: true,
+  number_of_bedrooms: true,
+  number_of_bathrooms: true,
+};
 interface GetHomesParams {
   city?: string;
   price?: {
