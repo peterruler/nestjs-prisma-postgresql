@@ -140,7 +140,7 @@ describe('HomeService', () => {
       realtorId: userId, // hier hinzufügen
     };
 
-    it('should call prisma home.create with the correct payload', async () => {
+    it('should call prisma home.findMany with correct params', async () => {
       // Destructure, damit die Shorthands weiter unten funktionieren
       const {
         address,
@@ -181,6 +181,16 @@ describe('HomeService', () => {
       expect(result).toEqual(mockGetHomesSnakeCase[0]);
     });
   });
+
+  it('should call prisma image.createMany with the correct payload', async () => {
+    const mockCreateManyImage = jest.fn().mockReturnValue(mockImages);
+    jest
+      .spyOn(prismaService.image, 'createMany')
+      .mockImplementation(mockCreateManyImage);
+
+
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
