@@ -4,16 +4,23 @@ import { HomeService } from './home.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { PropertyType } from '@prisma/client';
+import { HomeResponseDto } from './dto/home.dto';
 const mockUser = {
   id: 1,
   email: '7starch@gmail.com',
   phone: '0793057029',
 };
 const mockHome = {
-  id: 11,
-  city: 'Peter',
-  phone: '0793057029',
-  email: '7starch@gmail.com',
+  address: '123 Main St',
+  city: 'Berlin',
+  numberOfBedrooms: 3,
+  numberOfBathrooms: 2,
+  listedDate: new Date(),
+  price: 300000,
+  image: 'image.jpg',
+  landSize: 500,
+  propertyType: PropertyType.RESIDENTIAL,
+  realtorId: mockUser.id, // Added realtorId
 };
 describe('HomeController', () => {
   let controller: HomeController;
@@ -75,12 +82,56 @@ describe('HomeController', () => {
       image: 'image.jpg',
       landSize: 500,
       propertyType: PropertyType.RESIDENTIAL,
-      realtorId: mockUser.id, // Added realtorId
+      realtorId: mockUser.id,
     };
+    // Erstelle zuerst ein „rohes“ Objekt wie es der Service zurückgeben würde
+    const rawUpdated = {
+      id: 1,
+      address: mockCreateHomeParams.address,
+      city: mockCreateHomeParams.city,
+      price: mockCreateHomeParams.price,
+      propertyType: mockCreateHomeParams.propertyType,
+      number_of_bedrooms: mockCreateHomeParams.numberOfBedrooms,
+      number_of_bathrooms: mockCreateHomeParams.numberOfBathrooms,
+      listed_date: mockCreateHomeParams.listedDate,
+      land_size: mockCreateHomeParams.landSize,
+      created_at: new Date(),
+      updated_at: new Date(),
+      realtor_id: mockUser.id,
+      images: [{ url: mockCreateHomeParams.image }],
+    };
+    // Wandle das in ein HomeResponseDto um
+    const mockUpdatedDto = new HomeResponseDto({
+      ...rawUpdated,
+      image: rawUpdated.images[0].url,
+    });
     it("should throw unauth error if realtor didn't create home", async () => {
       return await expect(
         controller.updateHome(2, mockCreateHomeParams, mockUserInfo),
       ).rejects.toThrowError(UnauthorizedException);
+    });
+    it('should update home if realtor id is valid', async () => {
+      // Override: jetzt stimmt die zurückgegebene ID mit mockUser.id überein
+      jest
+        .spyOn(homeService, 'getRealtorByHomeId')
+        .mockResolvedValue({ id: mockUser.id, name: 'John Doe', phone: '0793057029', email: '7starch@gmail.com' });
+
+      // Spy für das Update
+      jest
+        .spyOn(homeService, 'updateHomeById')
+        .mockResolvedValue(mockUpdatedDto);
+
+      const result = await controller.updateHome(
+        1,
+        mockCreateHomeParams,
+        { ...mockUserInfo, id: mockUser.id },
+      );
+
+      expect(homeService.updateHomeById).toHaveBeenCalledWith(
+        1,
+        mockCreateHomeParams,
+      );
+      expect(result).toEqual(mockUpdatedDto);
     });
   });
 });
