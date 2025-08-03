@@ -187,8 +187,11 @@ describe('HomeService', () => {
     jest
       .spyOn(prismaService.image, 'createMany')
       .mockImplementation(mockCreateManyImage);
-
-
+    const result = await service.createHome(createHomeParams, 28);
+    expect(mockCreateManyImage).toBeCalledWith({
+      data: [{ url: 'src1', home_id: mockGetHomesSnakeCase[0].id }],
+    });
+    expect(result).toEqual(mockGetHomesSnakeCase[0]);
   });
 
   it('should be defined', () => {
