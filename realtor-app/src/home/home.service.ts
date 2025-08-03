@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { HomeResponseDto } from './dto/home.dto';
 import { PropertyType } from 'generated/prisma';
+import { UserInfo } from 'src/user/decorators/user.decorators';
 
 interface GetHomesParams {
   city?: string;
@@ -34,6 +35,7 @@ interface UpdateHomeParams {
 }
 @Injectable()
 export class HomeService {
+  // Removed duplicate inquire method implementation
   async updateHomeById(id: number, data: UpdateHomeParams) {
     const home = await this.prisma.home.findUnique({
       where: {
@@ -144,5 +146,35 @@ export class HomeService {
       throw new NotFoundException();
     }
     return realtor.realtor;
+  }
+  async inquire(buyer: UserInfo, homeId: number, message: string) {
+    const realtor = await this.getRealtorByHomeId(homeId);
+    return this.prisma.message.create({
+      data: {
+        home_id: homeId,
+        buyer_id: buyer.id,
+        realtor_id: realtor.id,
+
+        message,
+      },
+    });
+  }
+  getHomeMessagesByHome(homeId: number) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    return this.prisma.message.findMany({
+      where: {
+        home_id: homeId,
+      },
+      select: {
+        message: true,
+        buyer: {
+          select: {
+            phone: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
   }
 }

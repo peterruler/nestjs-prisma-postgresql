@@ -9,13 +9,16 @@ import {
   Body,
   ParseIntPipe,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { HomeResponseDto, CreateHomeDto, UpdateHomeDto } from './dto/home.dto';
+import {
+  HomeResponseDto,
+  CreateHomeDto,
+  UpdateHomeDto,
+  InquireDto,
+} from './dto/home.dto';
 import { PropertyType, UserType } from 'generated/prisma';
 import { User, UserInfo } from '../user/decorators/user.decorators';
-import { AuthGuard } from '../guards/auth.guards';
 import { Roles } from 'src/decorators/roles.decorator';
 @Controller('home')
 export class HomeController {
@@ -76,4 +79,33 @@ export class HomeController {
     }
     return this.homeService.deleteHomeById(id);
   }
+  @Post('/:id/inquire')
+  async inquire(
+    @Param('id', ParseIntPipe) homeId: number,
+    @User() user: UserInfo,
+    @Body() { message }: InquireDto,
+  ) {
+    const home = await this.homeService.getHomeById(homeId);
+    if (!home) {
+      throw new UnauthorizedException('Home not found');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return this.homeService.inquire(user, homeId, message);
+  }
+  @Roles(UserType.REALTOR)
+  @Get(':id/messages')
+  async getHomeMessages(
+    @Param('id', ParseIntPipe) id: number,
+    @User() user: UserInfo,
+  ) {
+    const realtor = await this.homeService.getRealtorByHomeId(id);
+    if (realtor.id !== user.id) {
+      throw new UnauthorizedException();
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return this.homeService.getHomeMessagesByHome(id);
+  }
 }
+// 1) Buyer sends message to realtor
+// 2) Realtor gets all messages

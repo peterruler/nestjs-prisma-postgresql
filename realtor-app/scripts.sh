@@ -11,3 +11,5 @@ npm i @nestjs/typeorm typeorm pg
 nest g module prisma
 nest g service prisma
 npm install @prisma/client
+
+npm run test -- --no-watchman home.service.spec.ts
