@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from './../prisma/prisma.service';
 import { PropertyType } from '@prisma/client';
 import { HomeService, homeSelect } from './home.service';
+import { NotFoundException } from '@nestjs/common';
 
 const mockGetHomes = [
   {
@@ -62,7 +63,6 @@ describe('HomeService', () => {
 
       const homes = await service.getHomes(filters);
       expect(mockPrismaFindManyHomes).toBeCalledWith({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         select: {
           ...homeSelect,
           images: {
@@ -77,8 +77,24 @@ describe('HomeService', () => {
     });
   });
 
+  it('should throw not found exception if no homes found', async () => {
+    const filters = {
+      city: 'Toronto',
+      price: {
+        gte: 1000000,
+        lte: 3000000,
+      },
+      propertyType: PropertyType.RESIDENTIAL,
+    };
+    const mockPrismaFindManyHomes = jest.fn().mockReturnValue([]);
+    jest
+      .spyOn(prismaService.home, 'findMany')
+      .mockImplementation(mockPrismaFindManyHomes);
+    await expect(service.getHomes(filters)).rejects.toThrowError(
+      NotFoundException,
+    );
+  });
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });
-
