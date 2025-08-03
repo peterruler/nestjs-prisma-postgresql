@@ -73,31 +73,41 @@ export class HomeService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getHomes(filter: GetHomesParams): Promise<HomeResponseDto[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const homes = await this.prisma.home.findMany({
       select: {
-        id: true,
-        address: true,
-        city: true,
-        price: true,
-        propertyType: true,
-        number_of_bathrooms: true,
-        number_of_bedrooms: true,
+        ...homeSelect,
         images: {
-          select: { url: true },
+          select: {
+            url: true,
+          },
           take: 1,
         },
       },
       where: filter,
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (!homes.length) {
-      throw new NotFoundException('No homes found with the provided filters');
+      throw new NotFoundException();
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     return homes.map((home) => {
+      // images per Destructuring entfernen und auf image umwandeln
       const { images, ...rest } = home;
-      const fetchHome = { ...rest, image: images[0]?.url };
+      let img;
+      if (images?.length > 0) {
+        img = images[0];
+      }
+      if (!img) {
+        img = { url: '' };
+      }
+      const fetchHome = { ...rest, image: img.url };
       return new HomeResponseDto(fetchHome);
     });
   }
+
   async createHome(
     {
       address,
@@ -169,7 +179,6 @@ export class HomeService {
     });
   }
   getHomeMessagesByHome(homeId: number) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     return this.prisma.message.findMany({
       where: {
         home_id: homeId,
