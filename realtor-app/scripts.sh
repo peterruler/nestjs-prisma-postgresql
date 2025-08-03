@@ -13,3 +13,4 @@ nest g service prisma
 npm install @prisma/client
 
 npm run test -- --no-watchman home.service.spec.ts
+npm run test -- --no-watchman home.controller.spec.ts

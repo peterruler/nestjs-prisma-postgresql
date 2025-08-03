@@ -103,6 +103,7 @@ export class HomeService {
       if (!img) {
         img = { url: '' };
       }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const fetchHome = { ...rest, image: img.url };
       return new HomeResponseDto(fetchHome);
     });

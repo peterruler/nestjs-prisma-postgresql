@@ -1,59 +1,69 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as jwt from 'jsonwebtoken';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
-interface JwtPayload {
-  id: number;
+interface JWTPayload {
   name: string;
+  id: number;
   iat: number;
   exp: number;
 }
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly prismaService: PrismaService,
   ) {}
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    // 1) Determine the UserType that can execute the called endpoint
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
+
+  async canActivate(context: ExecutionContext) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const roles = this.reflector.getAllAndOverride('roles', [
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       context.getHandler(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       context.getClass(),
     ]);
 
-    // 2) Grab the JWT from the request header and verify it
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (roles?.length) {
+      const request = context.switchToHttp().getRequest<Request>();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const request = context.switchToHttp().getRequest();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const token = request.headers?.authorization?.split('Bearer ')[1];
+      const authorizationHeader = request.headers?.authorization;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const token = authorizationHeader?.startsWith('Bearer ')
+        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          authorizationHeader.split('Bearer ')[1]
+        : undefined;
       try {
-        if (!process.env.JSON_KEY) {
-          throw new Error('JSON_KEY is not defined in environment variables');
+        if (!token || typeof token !== 'string') {
+          throw new Error('Invalid token');
         }
-        const payload = jwt.verify(token, process.env.JSON_KEY) as JwtPayload;
-        // 3) Database request to get user by id
+
+        const secretKey = process.env.JSON_TOKEN_KEY;
+        if (!secretKey) {
+          throw new Error('Missing JSON_TOKEN_KEY environment variable');
+        }
+
+        const payload = jwt.verify(token, secretKey) as unknown as JWTPayload;
+
         const user = await this.prismaService.user.findUnique({
-          where: { id: payload.id },
+          where: {
+            id: payload.id,
+          },
         });
-        if (!user) {
-          return false;
-        }
-        // 3) Check if the user has the required role
-        // 4) Determine if the user has permission
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        if (roles.includes(user.user_type)) {
-          return true;
-        }
+
+        if (!user) return false;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if (roles.includes(user.user_type)) return true;
+
         return false;
-      } catch (e) {
-        return false; // Error during verification
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        return false;
       }
     }
-    return false;
+
+    return true;
   }
 }
