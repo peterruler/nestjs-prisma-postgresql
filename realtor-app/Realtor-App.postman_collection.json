@@ -1,0 +1,382 @@
+{
+	"info": {
+		"_postman_id": "c2c535b2-65a9-4d0a-970a-2194936f5bdc",
+		"name": "Realtor-App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26918199"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Realtor\",\n    \"phone\": \"0793057029\",\n    \"email\" : \"foo@realtor.com\",\n    \"password\" : \"bananas\",\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/signup/BUYER",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"signup",
+								"BUYER"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"foobar88@hotmail.com\",\n    \"password\" : \"bananas\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Product Key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"mike@realtor.com\",\n    \"userType\" : \"REALTOR\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/key",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"key"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup As Realtor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Peter\",\n    \"phone\": \"0793057029\",\n    \"email\" : \"foobar44@hotmail.com\",\n    \"password\" : \"bananas\",\n    \"productKey\" : \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/auth/signup/REALTOR",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"signup",
+								"REALTOR"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Homes",
+			"item": [
+				{
+					"name": "Ger All Homes",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/home?city=Berlin&minPrice=100&maxPrice=1000000&propertyType=RESIDENTIAL",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home"
+							],
+							"query": [
+								{
+									"key": "city",
+									"value": "Berlin"
+								},
+								{
+									"key": "minPrice",
+									"value": "100"
+								},
+								{
+									"key": "maxPrice",
+									"value": "1000000"
+								},
+								{
+									"key": "propertyType",
+									"value": "RESIDENTIAL"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Home by Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/home/29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home",
+								"29"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Home",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGVmYXVsdCBOYW1lIiwiaWQiOjI3LCJpYXQiOjE3NTQwNjA1OTUsImV4cCI6MTc1NzY2MDU5NX0.N_f1XX7Gt2736Z5HUbnIGIYbIcetDG8X_4-RMuFKtNI",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numberOfBedrooms\": 8,\n  \"numberOfBathrooms\": 8,\n  \"address\": \"2222 Kafka Ave\",\n  \"city\": \"New Jersey\",\n  \"price\": 5000000,\n  \"landSize\": \"5000\",\n  \"propertyType\": \"CONDO\",\n  \"realtorId\": 11,\n           \"images\": [\n              \n               {\n                 \"url\": \"img007\"\n               },\n               {\n                 \"url\": \"img008\"\n               }\n             \n           ]\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/home",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Home",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"city\": \"Baden\",\n    \"address\": \"Badstrasse 11\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/home/27",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home",
+								"27"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Home",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGVmYXVsdCBOYW1lIiwiaWQiOjExLCJpYXQiOjE3NTQwNjI4NTgsImV4cCI6MTc1NzY2Mjg1OH0.KWVka0tJZIiwFgnq25Zhq79YnkCrq06vkXxVZJmS1Gw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/home/27",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home",
+								"27"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Homes Test User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorisation",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numberOfBedrooms\": 4,\n  \"numberOfBathrooms\": 5,\n  \"address\": \"1111 Axe Ave\",\n  \"city\": \"Dallas\",\n  \"price\": 5000000,\n  \"landSize\": \"5000\",\n  \"propertyType\": \"CONDO\",\n  \"realtorId\": 11,\n           \"images\": [\n              \n               {\n                 \"url\": \"img007\"\n               },\n               {\n                 \"url\": \"img008\"\n               }\n             \n           ]\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/home",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inquire",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "view all messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGVmYXVsdCBOYW1lIiwiaWQiOjExLCJpYXQiOjE3NTQxNjAyNTAsImV4cCI6MTc1Nzc2MDI1MH0.CgV7lYIRz2XLlfO5rE-gEvIxO-u3leAw-QBaoI4zcP8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/home/29/messages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"home",
+								"29",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
