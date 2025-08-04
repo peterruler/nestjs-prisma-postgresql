@@ -16,3 +16,9 @@
 
 # Based on udemy course
 - [nestjs udemy course](https://www.udemy.com/share/105Z2g3@Hye7HN8NhIcXSdpK_lx4GTgItV78v2AGmHqNUJu8Urq_uoYt9qy8qv0piY7lcEDGCg==/)
+
+# Call orm webtool
+- `npx prisma studio`
+
+# Run tests
+- `npm run test -- --no-watchman home.controller.spec.ts`
