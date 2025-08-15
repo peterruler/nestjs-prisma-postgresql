@@ -27,9 +27,9 @@ export class AuthGuard implements CanActivate {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (roles?.length) {
-      const request = context.switchToHttp().getRequest<Request>();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const authorizationHeader = request.headers?.authorization;
+      const request = context.switchToHttp().getRequest();
+      // Verwende get() Methode für Header-Zugriff
+      const authorizationHeader = request.headers?.get?.('authorization') || request.headers['authorization'];
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       const token = authorizationHeader?.startsWith('Bearer ')
         ? // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
